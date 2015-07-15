@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using System.Threading;
+using TShockAPI;
 using Terraria;
 using TerrariaApi;
 using TerrariaApi.Server;
-using TShockAPI;
-using System.Threading;
 
 
 namespace TSGeoIP
@@ -15,7 +15,8 @@ namespace TSGeoIP
     [ApiVersion(1, 19)]
     public class TSGeoIP : TerrariaPlugin
     {
-        public override Version version
+        
+        public override Version Version
         {
             get { return new Version("1.0"); }
         }

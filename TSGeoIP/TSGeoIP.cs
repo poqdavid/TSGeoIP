@@ -116,7 +116,7 @@ namespace TSGeoIP
         
 		private void OnInitialize(EventArgs args)
 		{
-			Commands.ChatCommands.Add(new Command("tsgeoip", TSGeoIPCMD, "tsgeoip"));
+			Commands.ChatCommands.Add(new Command("tsgeoip.admin.commands", TSGeoIPCMD, "tsgeoip"));
 		}
 
 		public void OnLeave(LeaveEventArgs args)
@@ -230,7 +230,6 @@ namespace TSGeoIP
         
 		private void OnChat(ServerChatEventArgs args)
 		{
-
 			if (args.Handled)
 				return;
 
@@ -269,7 +268,6 @@ namespace TSGeoIP
 				args.Handled = true;
 				return;
 			}
-			
 			if ((!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier))) {
 					if (!tsplr.Group.HasPermission(Permissions.canchat)) {
 						args.Handled = true;

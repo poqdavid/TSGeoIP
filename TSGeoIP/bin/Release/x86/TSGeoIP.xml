@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TSGeoIP</name>
+    </assembly>
+    <members>
+        <member name="T:TSGeoIP.Settings">
+            <summary>
+            And this part is for the settings :)
+            <list type="bullet">
+            <item>
+            <term>Author</term>
+            <description>POQDavid</description>
+            </item>
+            </list>
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.Settings.defaultAsPrefix">
+            <summary>
+             Default value for AsPrefix.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.Settings.defaultAsSuffix">
+            <summary>
+             Default value for AsSuffix.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.Settings.defaultPrefixString">
+            <summary>
+             Default value for PrefixString.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.Settings.defaultSuffixString">
+            <summary>
+             Default value for SuffixString.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.Settings.defaultGeoIPAPI">
+            <summary>
+             Default value for GeoIP_API.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.Settings.defaultAKCList">
+            <summary>
+             Default value for AKC_List.
+            </summary>
+        </member>
+        <member name="M:TSGeoIP.Settings.IsJSONValid(System.String)">
+            <summary>
+            Given the JSON string, validates if it's a correct
+            JSON string.
+            </summary>
+            <param name="json_string">JSON string to validate.</param>
+            <returns>true or false.</returns>
+        </member>
+        <member name="M:TSGeoIP.Settings.SaveSettting">
+            <summary>
+            Saves the plugin settings in TSGeoIP\TSGeoIP.json.
+            </summary>
+        </member>
+        <member name="M:TSGeoIP.Settings.LoadSettings">
+            <summary>
+            Loads the plugin settings from TSGeoIP\TSGeoIP.json.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.Settings.AsPrefix">
+            <summary>
+             Gets or sets the asPrefix property.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.Settings.AsSuffix">
+            <summary>
+             Gets or sets the asSuffix property.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.Settings.PrefixString">
+            <summary>
+             Gets or sets the PrefixString property.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.Settings.SuffixString">
+            <summary>
+             Gets or sets the SuffixString property.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.Settings.GeoIP_API">
+            <summary>
+             Gets or sets the GeoIP_API property.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.Settings.AKC_List">
+            <summary>
+             Gets or sets the AutoKick property.
+            </summary>
+        </member>
+        <member name="T:TSGeoIP.TSGeoIP">
+            <summary>
+            This program enables the use of GeoIP and GeoIP2 API
+            For TShock
+            <list type="bullet">
+            <item>
+            <term>Author</term>
+            <description>POQDavid</description>
+            </item>
+            </list>
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.TSGeoIP.Data_Dir">
+            <summary>
+            This is simply where plugin stores data and loads them from.
+            </summary>
+            <returns>directory for the plugin's data and settings.</returns>
+        </member>
+        <member name="F:TSGeoIP.TSGeoIP.GeoIP_LS">
+            <summary>
+            LookupService of GeoIP API in plugin.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.TSGeoIP.GeoIP2_DBR">
+            <summary>
+            DatabaseReader of GeoIP2 API in plugin.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.TSGeoIP.iSettings">
+            <summary>
+            This is a static member of the Settings.
+            </summary>
+        </member>
+        <member name="F:TSGeoIP.TSGeoIP.myPlayersData">
+            <summary>
+            To store player data.
+            </summary>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.#ctor(Terraria.Main)">
+            <summary>
+            The main program.
+            </summary>
+            <param name="game">Well it's clear what it is.</param>
+        </member>
+        <member name="F:TSGeoIP.TSGeoIP.that">
+            <summary>
+            A static member of the plugin.
+            </summary>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.ConsoleLOG(System.String)">
+            <summary>
+            A simple method to write in both console and log file.
+            </summary>
+            <param name="message">LOG message.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.ConsoleLOG(System.String,System.Diagnostics.TraceLevel)">
+            <summary>
+            A simple method to write in both console and log file
+            with an extra option to set TraceLevel.
+            </summary>
+            <param name="message">LOG message.</param>
+            <param name="tl">LOG TraceLevel.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.Initialize">
+            <summary>
+            Method to Initialize plugin's code.
+            </summary>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.GetPlayerFlag(TShockAPI.TSPlayer)">
+            <summary>
+            Method to get player's country ISO code.
+            </summary>
+            <param name="playerTemp">Gets the player object.</param>
+            <returns>Country ISO Code.</returns>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.Dispose(System.Boolean)">
+            <summary>
+            Method to dispose things needed.
+            </summary>
+            <param name="disposing">To dispose or not.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.OnInitialize(System.EventArgs)">
+            <summary>
+            Things to do OnInitialize.
+            </summary>
+            <param name="args">Containing event data.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.OnLeave(TerrariaApi.Server.LeaveEventArgs)">
+            <summary>
+            This event happens every time a player leaves the server.
+            </summary>
+            <param name="args">Containing event data.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.OnJoin(TerrariaApi.Server.JoinEventArgs)">
+            <summary>
+            This event happens every time a player joins the server.
+            </summary>
+            <param name="args">Containing event data.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.OnNetGreet(TerrariaApi.Server.GreetPlayerEventArgs)">
+            <summary>
+            This event happens every time player really joins the server.
+            </summary>
+            <param name="args">Containing event data.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.TSGeoIPCMD(TShockAPI.CommandArgs)">
+            <summary>
+            This method is for handling the plugin's commands.
+            </summary>
+            <param name="args">Containing event data.</param>
+        </member>
+        <member name="M:TSGeoIP.TSGeoIP.OnChat(TerrariaApi.Server.ServerChatEventArgs)">
+            <summary>
+            This method is for handling prefix and suffix in chat.
+            </summary>
+            <param name="args">Containing event data.</param>
+        </member>
+        <member name="P:TSGeoIP.TSGeoIP.Version">
+            <summary>
+            Plugin's version.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.TSGeoIP.Name">
+            <summary>
+            Plugin's name.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.TSGeoIP.Author">
+            <summary>
+            Plugin's author or POQDavid in this case lol.
+            </summary>
+        </member>
+    </members>
+</doc>

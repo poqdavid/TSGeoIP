@@ -14,6 +14,17 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
+    <NoWin32Manifest>False</NoWin32Manifest>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <WarningLevel>4</WarningLevel>
+    <SourceAnalysisOverrideSettingsFile>F:\Documents\MyProjects\TSGeoIP\TSGeoIP\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <DocumentationFile>bin\Release\x86\TSGeoIP.xml</DocumentationFile>
+    <SignAssembly>False</SignAssembly>
+    <DelaySign>False</DelaySign>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +33,6 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,7 +40,6 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -42,24 +51,46 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin\Release\x86\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+    <Optimize>True</Optimize>
+    <DebugType>Full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <StartAction>Project</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <BaseAddress>4194304</BaseAddress>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GeoIPAPI">
-      <HintPath>..\..\MyGeoIP\GeoIPAPI\bin\x86\Release\GeoIPAPI.dll</HintPath>
+    <Reference Include="MaxMind.Db">
+      <HintPath>packages\MaxMind.Db.1.1.0\lib\net40\MaxMind.Db.dll</HintPath>
+    </Reference>
+    <Reference Include="MaxMind.GeoIP">
+      <HintPath>packages\MaxMind.GeoIP.2.1.17\lib\net35\MaxMind.GeoIP.dll</HintPath>
+    </Reference>
+    <Reference Include="MaxMind.GeoIP2">
+      <HintPath>packages\MaxMind.GeoIP2.2.3.1\lib\net40\MaxMind.GeoIP2.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\TShockAPI\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>packages\RestSharp.105.1.0\lib\net45\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,12 +98,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="TerrariaServer">
       <HintPath>..\..\TShockAPI\TerrariaServer.exe</HintPath>
-      <Private>False</Private>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="TShockAPI, Version=4.3.5.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="TShockAPI">
       <HintPath>..\..\TShockAPI\ServerPlugins\TShockAPI.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -82,14 +110,22 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin" />
-    <Folder Include="bin\x86" />
-    <Folder Include="bin\x86\Release" />
+    <Folder Include="bin\Release" />
+    <Folder Include="bin\Release\x86" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\x86\Release\GeoIPAPI.dll" />
-    <None Include="bin\x86\Release\GeoIPAPI.pdb" />
-    <None Include="bin\x86\Release\TSGeoIP.dll" />
-    <None Include="bin\x86\Release\TSGeoIP.pdb" />
+    <None Include="bin\Release\x86\MaxMind.Db.dll" />
+    <None Include="bin\Release\x86\MaxMind.Db.xml" />
+    <None Include="bin\Release\x86\MaxMind.GeoIP.dll" />
+    <None Include="bin\Release\x86\MaxMind.GeoIP2.dll" />
+    <None Include="bin\Release\x86\MaxMind.GeoIP2.xml" />
+    <None Include="bin\Release\x86\Newtonsoft.Json.dll" />
+    <None Include="bin\Release\x86\Newtonsoft.Json.xml" />
+    <None Include="bin\Release\x86\RestSharp.dll" />
+    <None Include="bin\Release\x86\RestSharp.xml" />
+    <None Include="bin\Release\x86\TSGeoIP.dll" />
+    <None Include="bin\Release\x86\TSGeoIP.pdb" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

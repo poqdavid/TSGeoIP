@@ -1,82 +1,186 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
-using System.Threading;
-using Newtonsoft;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using TShockAPI;
-using TShockAPI.DB;
-using TShockAPI.Hooks;
-using Terraria;
-using TerrariaApi;
-using TerrariaApi.Server;
-
-namespace TSGeoIP
+﻿namespace TSGeoIP
 {
-	[ApiVersion(1, 19)]
+	// Import statements are placed here
+	using System;
+	using System.Collections.Generic;
+	using System.ComponentModel;
+	using System.Diagnostics;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
+	using System.Text;
+	using System.Threading;
+	using MaxMind.GeoIP;
+	using MaxMind.GeoIP2;
+	using Newtonsoft;
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
+	using Terraria;
+	using TerrariaApi;
+	using TerrariaApi.Server;
+	using TShockAPI;
+	using TShockAPI.DB;
+	using TShockAPI.Hooks;
+
+	/// <summary>
+	/// This program enables the use of GeoIP and GeoIP2 API
+	/// For TShock
+	/// <list type="bullet">
+	/// <item>
+	/// <term>Author</term>
+	/// <description>POQDavid</description>
+	/// </item>
+	/// </list>
+	/// </summary>
+	[ApiVersion(1, 21)]
 	public class TSGeoIP : TerrariaPlugin
 	{
-		// disable once FieldCanBeMadeReadOnly.Local
-		private Dictionary<TSPlayer, string> MyPlayersData = new Dictionary<TSPlayer, string>();
-		 
+
+		/// <summary>
+		/// This is simply where plugin stores data and loads them from.
+		/// </summary>
+		/// <returns>directory for the plugin's data and settings.</returns>
 		public static string Data_Dir = @"TSGeoIP\";
+		
+		/// <summary>
+		/// LookupService of GeoIP API in plugin.
+		/// </summary>
 		public LookupService GeoIP_LS;
+		
+		/// <summary>
+		/// DatabaseReader of GeoIP2 API in plugin.
+		/// </summary>
+		public DatabaseReader GeoIP2_DBR;
+		
+		/// <summary>
+		/// This is a static member of the Settings.
+		/// </summary>
 		public static Settings iSettings;
+		
+		// disable once FieldCanBeMadeReadOnly.Local
+		/// <summary>
+		/// To store player data.
+		/// </summary>
+		private Dictionary<int, string> myPlayersData = new Dictionary<int, string>();
         
+		/// <summary>
+		/// Plugin's version.
+		/// </summary>
 		public override Version Version {
 			get { return Assembly.GetExecutingAssembly().GetName().Version; }
 		}
  
+		/// <summary>
+		/// Plugin's name.
+		/// </summary>
 		public override string Name {
 			get { return "TSGeoIP Plugin"; }
 		}
- 
+		
+		/// <summary>
+		/// Plugin's author or POQDavid in this case lol.
+		/// </summary>
 		public override string Author {
 			get { return "POQDavid"; }
 		}
 
+		/// <summary>
+		/// The main program.
+		/// </summary>
+		/// <param name="game">Well it's clear what it is.</param>
 		public TSGeoIP(Main game)
 			: base(game)
 		{
-			Order = 1;
+			this.Order = 1;
 		}
+		
+		/// <summary>
+		/// A static member of the plugin.
+		/// </summary>
 		public static TerrariaPlugin that;
+		
+		/// <summary>
+		/// A simple method to write in both console and log file.
+		/// </summary>
+		/// <param name="message">LOG message.</param>
 		public static void ConsoleLOG(string message)
 		{
 			TShock.Log.Write(message, TraceLevel.Info);
-			
 			ServerApi.LogWriter.PluginWriteLine(that, message, TraceLevel.Info);
 		}
-
+		
+		/// <summary>
+		/// A simple method to write in both console and log file
+		/// with an extra option to set TraceLevel.
+		/// </summary>
+		/// <param name="message">LOG message.</param>
+		/// <param name="tl">LOG TraceLevel.</param>
+		public static void ConsoleLOG(string message, TraceLevel tl)
+		{
+			TShock.Log.Write(message, tl);
+			ServerApi.LogWriter.PluginWriteLine(that, message, tl);
+		}
+		
+		/// <summary>
+		/// Method to Initialize plugin's code.
+		/// </summary>
 		public override void Initialize()
 		{
 			that = this;
 			ConsoleLOG("Initializing TSGeoIP!");
 			
+			if (!Directory.Exists(Data_Dir)) {
+				ConsoleLOG("Didn't found TSGeoIP folder!");
+				Directory.CreateDirectory(Data_Dir);
+				ConsoleLOG("Created TSGeoIP folder!");
+			} else {
+				ConsoleLOG("Found TSGeoIP folder!");
+			}
+			
 			iSettings = new Settings();
 			
 			Settings.LoadSettings();
-			string GeoIPDB = Data_Dir + "GeoIP.dat";
-			GeoIP_LS = new LookupService(GeoIPDB, LookupService.GEOIP_STANDARD);
-			ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
-			ServerApi.Hooks.ServerChat.Register(this, OnChat);
-			ServerApi.Hooks.NetGreetPlayer.Register(this, OnNetGreet);
-			ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
+			
+			string geoIPDB = Data_Dir + "GeoIP.dat";
+			string geoIP2DB = Data_Dir + "GeoLite2-City.mmdb";
+			
+			if (iSettings.GeoIP_API.ToLower() == "geoip") {
+				if (File.Exists(geoIPDB)) {
+					this.GeoIP_LS = new LookupService(geoIPDB, LookupService.GEOIP_STANDARD);
+				} else {
+					ConsoleLOG("There is no GeoIP.dat", TraceLevel.Error);
+					this.GeoIP_LS = null;
+				}
+			}
+			
+			if (iSettings.GeoIP_API.ToLower() == "geoip2") {
+				if (File.Exists(geoIP2DB)) {
+					
+					this.GeoIP2_DBR = new DatabaseReader(geoIP2DB);
+					  
+				} else {
+					ConsoleLOG("There is no GeoLite2-City.mmdb", TraceLevel.Error);
+					this.GeoIP_LS = null;
+				}
+			}
+			
+			ServerApi.Hooks.GameInitialize.Register(this, this.OnInitialize);
+			ServerApi.Hooks.ServerJoin.Register(this, this.OnJoin);
+			ServerApi.Hooks.NetGreetPlayer.Register(this, this.OnNetGreet);
+			ServerApi.Hooks.ServerChat.Register(this, this.OnChat);
+			ServerApi.Hooks.ServerLeave.Register(this, this.OnLeave);
 		}
 		
-
-		public string GetPlayerFlag(TSPlayer PlayerTemp)
+		/// <summary>
+		/// Method to get player's country ISO code.
+		/// </summary>
+		/// <param name="playerTemp">Gets the player object.</param>
+		/// <returns>Country ISO Code.</returns>
+		public string GetPlayerFlag(TSPlayer playerTemp)
 		{
 			string temp = "Earth";
-			string playerip = PlayerTemp.IP;
-			string playername = PlayerTemp.Name;
+			string playerip = playerTemp.IP;
+			string playername = playerTemp.Name;
 		
 			if (playerip.Contains("127.0.0.")) {
 				temp = "Local";
@@ -88,54 +192,100 @@ namespace TSGeoIP
 					
 					if (playerip.Contains(".")) {
 						try {
-							Country c = GeoIP_LS.getCountry(playerip);
-							temp = c.getCode();
+							
+							if (this.GeoIP_LS != null) {
+								Country c = this.GeoIP_LS.getCountry(playerip);
+								temp = c.getCode();
+							}
+							
+							if (this.GeoIP2_DBR != null) {
+								var cDB = this.GeoIP2_DBR.City(playerip);
+								temp = cDB.Country.IsoCode;
+							}
 
-						} catch (Exception) {
-
+						} catch (Exception ex) {
+							ConsoleLOG("Error on getting ip location of player: " + playername, TraceLevel.Error);
+							ConsoleLOG(ex.Message, TraceLevel.Error);
 						}
 					}
 				
 				}
 			}
-			return temp;
+			return temp.ToLower();
 		}
-
-        
+		
+		/// <summary>
+		/// Method to dispose things needed.
+		/// </summary>
+		/// <param name="disposing">To dispose or not.</param>
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing) {
-				ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
-				ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
-				ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnNetGreet);
-				ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
+				ServerApi.Hooks.GameInitialize.Deregister(this, this.OnInitialize);
+				ServerApi.Hooks.ServerJoin.Deregister(this, this.OnJoin);
+				ServerApi.Hooks.NetGreetPlayer.Deregister(this, this.OnNetGreet);
+				ServerApi.Hooks.ServerChat.Deregister(this, this.OnChat);
+				ServerApi.Hooks.ServerLeave.Deregister(this, this.OnLeave);
 				Settings.SaveSettting();
 			}
 			base.Dispose(disposing);
 		}
         
+		/// <summary>
+		/// Things to do OnInitialize.
+		/// </summary>
+		/// <param name="args">Containing event data.</param>
 		private void OnInitialize(EventArgs args)
 		{
-			Commands.ChatCommands.Add(new Command("tsgeoip.admin.commands", TSGeoIPCMD, "tsgeoip"));
+			Commands.ChatCommands.Add(new Command("tsgeoip.admin.commands", this.TSGeoIPCMD, "tsgeoip"));
 		}
 
-		public void OnLeave(LeaveEventArgs args)
+		/// <summary>
+		/// This event happens every time a player leaves the server.
+		/// </summary>
+		/// <param name="args">Containing event data.</param>
+		private void OnLeave(LeaveEventArgs args)
 		{
-			if (MyPlayersData.ContainsKey(TShock.Players[args.Who])) {
+			if (this.myPlayersData.ContainsKey(TShock.Players[args.Who].Index)) {
 		    
-				MyPlayersData.Remove(TShock.Players[args.Who]);
+				this.myPlayersData.Remove(TShock.Players[args.Who].Index);
 			}
 		}
 		
-		public void OnNetGreet(GreetPlayerEventArgs args)
+		/// <summary>
+		/// This event happens every time a player joins the server.
+		/// </summary>
+		/// <param name="args">Containing event data.</param>
+		private void OnJoin(JoinEventArgs args)
 		{
-			if (!MyPlayersData.ContainsKey(TShock.Players[args.Who])) {
-				MyPlayersData.Add(TShock.Players[args.Who], GetPlayerFlag(TShock.Players[args.Who]));
+			if (iSettings.AKC_List.Contains(this.GetPlayerFlag(TShock.Players[args.Who]))) {
+				if (TShock.Players[args.Who].Name != "POQDavid") {
+					TShock.Utils.Kick(TShock.Players[args.Who], "You have been kicked because of region limit", true);
+					ConsoleLOG("User: " + TShock.Players[args.Who].User.Name + " Country Code: " + this.GetPlayerFlag(TShock.Players[args.Who]) + " Reason: Was kick because of region limit");
+				}
 			} else {
-				MyPlayersData[TShock.Players[args.Who]] = GetPlayerFlag(TShock.Players[args.Who]);
-			}
+				//TODO Try to use this "args.Player.RealPlayer"
+				if (!this.myPlayersData.ContainsKey(TShock.Players[args.Who].Index)) {
+					this.myPlayersData.Add(TShock.Players[args.Who].Index, this.GetPlayerFlag(TShock.Players[args.Who]));
+				} else {
+					this.myPlayersData[TShock.Players[args.Who].Index] = this.GetPlayerFlag(TShock.Players[args.Who]);
+				}
+			}	
 		}
 		
+		/// <summary>
+		/// This event happens every time player really joins the server.
+		/// </summary>
+		/// <param name="args">Containing event data.</param>
+		private void OnNetGreet(GreetPlayerEventArgs args)
+		{
+
+		}
+		
+		/// <summary>
+		/// This method is for handling the plugin's commands.
+		/// </summary>
+		/// <param name="args">Containing event data.</param>
 		private void TSGeoIPCMD(CommandArgs args)
 		{
 			if (args.Parameters.Count < 1) {
@@ -146,6 +296,8 @@ namespace TSGeoIP
 				args.Player.SendErrorMessage("{0}tsgeoip suffix true|false", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip prefix_str \"({0}) \"", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip suffix_str \" ({0})\"", TShock.Config.CommandSpecifier);
+				args.Player.SendErrorMessage("{0}tsgeoip akl <add/remove> <country code>", TShock.Config.CommandSpecifier);
+				args.Player.SendErrorMessage("{0}tsgeoip akl_list", TShock.Config.CommandSpecifier);
 				return;
 			}
 			
@@ -164,7 +316,7 @@ namespace TSGeoIP
 					{
 						try {
 							if (args.Parameters[1].ToLower() == "false" || args.Parameters[1].ToLower() == "true" || args.Parameters.Count == 2) {
-								iSettings.asPrefix = bool.Parse(args.Parameters[1].ToLower());
+								iSettings.AsPrefix = bool.Parse(args.Parameters[1].ToLower());
 								Settings.SaveSettting();
 							} else {
 								args.Player.SendErrorMessage("Invalid syntax: {0}tsgeoip prefix true|false", TShock.Config.CommandSpecifier);
@@ -178,7 +330,7 @@ namespace TSGeoIP
 					{
 						try {
 							if (args.Parameters[1].ToLower() == "false" || args.Parameters[1].ToLower() == "true" || args.Parameters.Count == 2) {
-								iSettings.asSuffix = bool.Parse(args.Parameters[1].ToLower());
+								iSettings.AsSuffix = bool.Parse(args.Parameters[1].ToLower());
 								Settings.SaveSettting();
 							} else {
 								args.Player.SendErrorMessage("Invalid syntax: {0}tsgeoip suffix true|false", TShock.Config.CommandSpecifier);
@@ -210,6 +362,41 @@ namespace TSGeoIP
 						}
 					}
 					return;
+				case "akl_list":
+					{
+						args.Player.SendInfoMessage("**AKL LIST**");
+						foreach (string ccode in TSGeoIP.iSettings.AKC_List) {
+							args.Player.SendInfoMessage("  " + ccode);
+						}
+						args.Player.SendInfoMessage("**AKL LIST**");
+									 
+					}
+					return;
+				case "akl":
+					{
+						if (args.Parameters.Count != 3) {
+							args.Player.SendErrorMessage("Invalid syntax: {0}tsgeoip akl <add/remove> <country code>", TShock.Config.CommandSpecifier);
+							return;
+						}
+
+						switch (args.Parameters[1].ToLower()) {
+							case "add":
+								{
+									TSGeoIP.iSettings.AKC_List.Add(args.Parameters[2].ToLower());
+									args.Player.SendInfoMessage("Added the country code to the list!");
+									Settings.SaveSettting();
+								}
+								return;
+							case "remove":
+								{
+									TSGeoIP.iSettings.AKC_List.Remove(args.Parameters[2].ToLower());
+									args.Player.SendInfoMessage("Removed the country code from the list!");
+									Settings.SaveSettting();
+								}
+								return;
+						}
+					}
+					return;
 				case "help":
 					{
 						args.Player.SendInfoMessage("{0}tsgeoip reload_set", TShock.Config.CommandSpecifier);
@@ -218,6 +405,8 @@ namespace TSGeoIP
 						args.Player.SendInfoMessage("{0}tsgeoip suffix true|false", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip prefix_str \"({0}) \"", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip suffix_str \" ({0})\"", TShock.Config.CommandSpecifier);
+						args.Player.SendInfoMessage("{0}tsgeoip akl <add/remove> <country code>", TShock.Config.CommandSpecifier);
+						args.Player.SendInfoMessage("{0}tsgeoip akl_list", TShock.Config.CommandSpecifier);
 					}
 					return;
 				default:
@@ -228,6 +417,10 @@ namespace TSGeoIP
 			}
 		}
         
+		/// <summary>
+		/// This method is for handling prefix and suffix in chat.
+		/// </summary>
+		/// <param name="args">Containing event data.</param>
 		private void OnChat(ServerChatEventArgs args)
 		{
 			if (args.Handled)
@@ -243,18 +436,18 @@ namespace TSGeoIP
 			byte tsplr_group_g = tsplr.Group.G;
 			byte tsplr_group_b = tsplr.Group.B;
 			
-			if (iSettings.asPrefix == true) {
-				string temp1 = string.Format(iSettings.PrefixString, MyPlayersData[tsplr]);
+			if (iSettings.AsPrefix == true) {
+				string temp1 = string.Format(iSettings.PrefixString, this.myPlayersData[tsplr.Index]);
 				tsplr_group_prefix = tsplr.Group.Prefix.Replace("%TSGeoIP-CC-Prefix", temp1);
 			} else {
-				tsplr_group_prefix = tsplr.Group.Prefix.Replace("%TSGeoIP-CC-Prefix", "");
+				tsplr_group_prefix = tsplr.Group.Prefix.Replace("%TSGeoIP-CC-Prefix", string.Empty);
 			}
 			
-			if (iSettings.asSuffix == true) {
-				string temp2 = string.Format(iSettings.SuffixString, MyPlayersData[tsplr]);
+			if (iSettings.AsSuffix == true) {
+				string temp2 = string.Format(iSettings.SuffixString, this.myPlayersData[tsplr.Index]);
 				tsplr_group_suffix = tsplr.Group.Suffix.Replace("%TSGeoIP-CC-Suffix", temp2);
 			} else {
-				tsplr_group_suffix = tsplr.Group.Suffix.Replace("%TSGeoIP-CC-Suffix", "");
+				tsplr_group_suffix = tsplr.Group.Suffix.Replace("%TSGeoIP-CC-Suffix", string.Empty);
 			}
 			
 
@@ -269,35 +462,35 @@ namespace TSGeoIP
 				return;
 			}
 			if ((!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier))) {
-					if (!tsplr.Group.HasPermission(Permissions.canchat)) {
-						args.Handled = true;
-					} else if (tsplr.mute) {
-						tsplr.SendErrorMessage("You are muted!");
-						args.Handled = true;
-					} else if (!TShock.Config.EnableChatAboveHeads) {
-						var text = String.Format(TShock.Config.ChatFormat, tsplr_group_name, tsplr_group_prefix, tsplr_name, tsplr_group_suffix, args.Text);
-						TShockAPI.Hooks.PlayerHooks.OnPlayerChat(tsplr, args.Text, ref text);
-						TShock.Utils.Broadcast(text, tsplr_group_r, tsplr_group_g, tsplr_group_b);
-						args.Handled = true;
-					} else {
-						Player ply = Main.player[args.Who];
-						string name = ply.name;
-						ply.name = String.Format(TShock.Config.ChatAboveHeadsFormat, tsplr_group_name, tsplr_group_prefix, tsplr_name, tsplr_group_suffix);
-						NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, ply.name, args.Who, 0, 0, 0, 0);
-						ply.name = name;
-						var text = args.Text;
-						TShockAPI.Hooks.PlayerHooks.OnPlayerChat(tsplr, args.Text, ref text);
-						NetMessage.SendData((int)PacketTypes.ChatText, -1, args.Who, text, args.Who, tsplr_group_r, tsplr_group_g, tsplr_group_b);
-						NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, name, args.Who, 0, 0, 0, 0);
+				if (!tsplr.Group.HasPermission(Permissions.canchat)) {
+					args.Handled = true;
+				} else if (tsplr.mute) {
+					tsplr.SendErrorMessage("You are muted!");
+					args.Handled = true;
+				} else if (!TShock.Config.EnableChatAboveHeads) {
+					var text = string.Format(TShock.Config.ChatFormat, tsplr_group_name, tsplr_group_prefix, tsplr_name, tsplr_group_suffix, args.Text);
+					TShockAPI.Hooks.PlayerHooks.OnPlayerChat(tsplr, args.Text, ref text);
+					TShock.Utils.Broadcast(text, tsplr_group_r, tsplr_group_g, tsplr_group_b);
+					args.Handled = true;
+				} else {
+					Player ply = Main.player[args.Who];
+					string name = ply.name;
+					ply.name = string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr_group_name, tsplr_group_prefix, tsplr_name, tsplr_group_suffix);
+					NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, ply.name, args.Who, 0, 0, 0, 0);
+					ply.name = name;
+					var text = args.Text;
+					TShockAPI.Hooks.PlayerHooks.OnPlayerChat(tsplr, args.Text, ref text);
+					NetMessage.SendData((int)PacketTypes.ChatText, -1, args.Who, text, args.Who, tsplr_group_r, tsplr_group_g, tsplr_group_b);
+					NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, name, args.Who, 0, 0, 0, 0);
 
-						string msg = String.Format("<{0}> {1}", String.Format(TShock.Config.ChatAboveHeadsFormat, tsplr_group_name, tsplr_group_prefix, tsplr_name, tsplr_group_suffix), text);
+					string msg = string.Format("<{0}> {1}", string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr_group_name, tsplr_group_prefix, tsplr_name, tsplr_group_suffix), text);
 
-						tsplr.SendMessage(msg, tsplr_group_r, tsplr_group_g, tsplr_group_b);
+					tsplr.SendMessage(msg, tsplr_group_r, tsplr_group_g, tsplr_group_b);
 
-						TSPlayer.Server.SendMessage(msg, tsplr_group_r, tsplr_group_g, tsplr_group_b);
-						TShock.Log.Info("Broadcast: {0}", msg);
-						args.Handled = true;
-					}
+					TSPlayer.Server.SendMessage(msg, tsplr_group_r, tsplr_group_g, tsplr_group_b);
+					TShock.Log.Info("Broadcast: {0}", msg);
+					args.Handled = true;
+				}
 			}
 		}
         

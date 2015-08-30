@@ -45,6 +45,11 @@
              Default value for AKC_List.
             </summary>
         </member>
+        <member name="F:TSGeoIP.Settings.defaultAKCWList">
+            <summary>
+             Default value for AKC_White_List.
+            </summary>
+        </member>
         <member name="M:TSGeoIP.Settings.IsJSONValid(System.String)">
             <summary>
             Given the JSON string, validates if it's a correct
@@ -90,7 +95,12 @@
         </member>
         <member name="P:TSGeoIP.Settings.AKC_List">
             <summary>
-             Gets or sets the AutoKick property.
+             Gets or sets the AutoKickList property.
+            </summary>
+        </member>
+        <member name="P:TSGeoIP.Settings.AKC_White_List">
+            <summary>
+             Gets or sets the AutoKickWhiteList property.
             </summary>
         </member>
         <member name="T:TSGeoIP.TSGeoIP">

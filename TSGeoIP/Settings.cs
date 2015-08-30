@@ -48,7 +48,12 @@
 		///<summary>
 		/// Default value for AKC_List.
 		///</summary>
-		private System.Collections.Generic.List<string> defaultAKCList = new System.Collections.Generic.List<string> {};
+		private System.Collections.Generic.List<string> defaultAKCList = new System.Collections.Generic.List<string> { };
+		
+		///<summary>
+		/// Default value for AKC_White_List.
+		///</summary>
+		private System.Collections.Generic.List<string> defaultAKCWList = new System.Collections.Generic.List<string> { "POQDavid" };
 		
 		///<summary>
 		/// Gets or sets the asPrefix property.
@@ -86,11 +91,16 @@
 		public string GeoIP_API { get { return this.defaultGeoIPAPI; } set { this.defaultGeoIPAPI = value; } }
 
 		///<summary>
-		/// Gets or sets the AutoKick property.
+		/// Gets or sets the AutoKickList property.
 		///</summary>
 		[JsonProperty("AutoKickList")]
 		public System.Collections.Generic.List<string> AKC_List { get { return this.defaultAKCList; } set { this.defaultAKCList = value; } }
 		
+		///<summary>
+		/// Gets or sets the AutoKickWhiteList property.
+		///</summary>
+		[JsonProperty("AutoKickWhiteList")]
+		public System.Collections.Generic.List<string> AKC_White_List { get { return this.defaultAKCWList; } set { this.defaultAKCWList = value; } }
 		
 		/// <summary>
 		/// Given the JSON string, validates if it's a correct

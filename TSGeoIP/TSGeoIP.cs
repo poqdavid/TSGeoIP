@@ -258,17 +258,19 @@
 		/// <param name="args">Containing event data.</param>
 		private void OnJoin(JoinEventArgs args)
 		{
-			if (iSettings.AKC_List.Contains(this.GetPlayerFlag(TShock.Players[args.Who]))) {
-				if (TShock.Players[args.Who].Name != "POQDavid") {
-					TShock.Utils.Kick(TShock.Players[args.Who], "You have been kicked because of region limit", true);
-					ConsoleLOG("User: " + TShock.Players[args.Who].User.Name + " Country Code: " + this.GetPlayerFlag(TShock.Players[args.Who]) + " Reason: Was kick because of region limit");
-				}
+			var tsplr = TShock.Players[args.Who];     
+			string tsplr_name = tsplr.Name;
+			string tsplr_user_name = tsplr.User.Name;
+			
+			if (iSettings.AKC_List.Contains(this.GetPlayerFlag(tsplr)) & (!iSettings.AKC_White_List.Contains(tsplr_name))) {
+				TShock.Utils.Kick(tsplr, "You have been kicked because of region limit", true);
+				ConsoleLOG("User: " + tsplr_user_name + " Country Code: " + this.GetPlayerFlag(tsplr) + " Reason: Was kick because of region limit");
 			} else {
 				//TODO Try to use this "args.Player.RealPlayer"
-				if (!this.myPlayersData.ContainsKey(TShock.Players[args.Who].Index)) {
-					this.myPlayersData.Add(TShock.Players[args.Who].Index, this.GetPlayerFlag(TShock.Players[args.Who]));
+				if (!this.myPlayersData.ContainsKey(tsplr.Index)) {
+					this.myPlayersData.Add(tsplr.Index, this.GetPlayerFlag(tsplr));
 				} else {
-					this.myPlayersData[TShock.Players[args.Who].Index] = this.GetPlayerFlag(TShock.Players[args.Who]);
+					this.myPlayersData[tsplr.Index] = this.GetPlayerFlag(tsplr);
 				}
 			}	
 		}

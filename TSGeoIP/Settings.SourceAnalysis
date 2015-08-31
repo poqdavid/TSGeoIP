@@ -2,6 +2,7 @@
   <GlobalSettings>
     <BooleanProperty Name="AutoCheckForUpdate">False</BooleanProperty>
     <CollectionProperty Name="RecognizedWords">
+      <Value>Dir</Value>
       <Value>json</Value>
     </CollectionProperty>
   </GlobalSettings>
@@ -34,7 +35,10 @@
           </RuleSettings>
         </Rule>
       </Rules>
-      <AnalyzerSettings />
+      <AnalyzerSettings>
+        <StringProperty Name="CompanyName">POQDavid</StringProperty>
+        <StringProperty Name="Copyright">Copyright (c) POQDavid. All rights reserved.</StringProperty>
+      </AnalyzerSettings>
     </Analyzer>
     <Analyzer AnalyzerId="StyleCop.CSharp.SpacingRules">
       <Rules>
@@ -284,6 +288,23 @@
     <Analyzer AnalyzerId="StyleCop.CSharp.ReadabilityRules">
       <Rules>
         <Rule Name="CodeMustNotContainMultipleStatementsOnOneLine">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+      </Rules>
+      <AnalyzerSettings />
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.CSharp.NamingRules">
+      <AnalyzerSettings>
+        <CollectionProperty Name="Hungarian">
+          <Value>i</Value>
+        </CollectionProperty>
+      </AnalyzerSettings>
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.CSharp.MaintainabilityRules">
+      <Rules>
+        <Rule Name="StatementMustNotUseUnnecessaryParenthesis">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>

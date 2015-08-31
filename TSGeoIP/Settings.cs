@@ -1,4 +1,9 @@
-﻿namespace TSGeoIP
+﻿// <copyright file="Settings.cs" company="POQDavid">
+// Copyright (c) POQDavid. All rights reserved.
+// </copyright>
+// <author>POQDavid</author>
+// <summary>This is the settings class.</summary>
+namespace TSGeoIP
 {
 	// Import statements are placed here
 	using System;
@@ -56,15 +61,17 @@
 		private System.Collections.Generic.List<string> defaultAKCWList = new System.Collections.Generic.List<string> { };
 		
 		///<summary>
-		/// Gets or sets the asPrefix property.
+		/// Gets or sets a value indicating whether to use prefix or not.
 		///</summary>
+		///<value>Use Prefix.</value>
 		[JsonProperty("asPrefix")]
 		[DefaultValue(true)]
 		public bool AsPrefix { get { return this.defaultAsPrefix; } set { this.defaultAsPrefix = value; } }
 
 		///<summary>
-		/// Gets or sets the asSuffix property.
+		/// Gets or sets a value indicating whether to use suffix or not.
 		///</summary>
+		///<value>Use Suffix.</value>
 		[JsonProperty("asSuffix")]
 		[DefaultValue(false)]
 		public bool AsSuffix { get { return this.defaultAsSuffix; } set { this.defaultAsSuffix = value; } }
@@ -72,6 +79,7 @@
 		///<summary>
 		/// Gets or sets the PrefixString property.
 		///</summary>
+		///<value>Prefix string.</value>
 		[JsonProperty("PrefixString")]
 		[DefaultValue("({0}) ")]
 		public string PrefixString { get { return this.defaultPrefixString; } set { this.defaultPrefixString = value; } }
@@ -79,6 +87,7 @@
 		///<summary>
 		/// Gets or sets the SuffixString property.
 		///</summary>
+		///<value>Suffix string.</value>
 		[JsonProperty("SuffixString")]
 		[DefaultValue(" ({0})")]
 		public string SuffixString { get { return this.defaultSuffixString; } set { this.defaultSuffixString = value; } }
@@ -86,6 +95,7 @@
 		///<summary>
 		/// Gets or sets the GeoIP_API property.
 		///</summary>
+		///<value>GeoIP API mode.</value>
 		[JsonProperty("GeoIP_API")]
 		[DefaultValue("GeoIP")]
 		public string GeoIP_API { get { return this.defaultGeoIPAPI; } set { this.defaultGeoIPAPI = value; } }
@@ -93,12 +103,14 @@
 		///<summary>
 		/// Gets or sets the AutoKickList property.
 		///</summary>
+		///<value>List of players for AutoKick.</value>
 		[JsonProperty("AutoKickList")]
 		public System.Collections.Generic.List<string> AKC_List { get { return this.defaultAKCList; } set { this.defaultAKCList = value; } }
 		
 		///<summary>
 		/// Gets or sets the AutoKickWhiteList property.
 		///</summary>
+		///<value>List of whitelisted players for AutoKick.</value>
 		[JsonProperty("AutoKickWhiteList")]
 		public System.Collections.Generic.List<string> AKC_White_List { get { return this.defaultAKCWList; } set { this.defaultAKCWList = value; } }
 		
@@ -127,7 +139,7 @@
 			var s = new JsonSerializerSettings();
 			s.ObjectCreationHandling = ObjectCreationHandling.Replace; // without this, you end up with duplicates.
 		
-			File.WriteAllText(TSGeoIP.Data_Dir + "TSGeoIP.json", JsonConvert.SerializeObject(TSGeoIP.iSettings, Formatting.Indented, s));
+			File.WriteAllText(TSGeoIP.DataDir + "TSGeoIP.json", JsonConvert.SerializeObject(TSGeoIP.ISettings, Formatting.Indented, s));
 		}
 		
 		/// <summary>
@@ -136,13 +148,13 @@
 		public static void LoadSettings()
 		{
 			try {
-				string json_string = File.ReadAllText(TSGeoIP.Data_Dir + "TSGeoIP.json");
+				string json_string = File.ReadAllText(TSGeoIP.DataDir + "TSGeoIP.json");
 				if (IsJSONValid(json_string)) {
 					var s = new JsonSerializerSettings();
 					s.NullValueHandling = NullValueHandling.Ignore;
 					s.ObjectCreationHandling = ObjectCreationHandling.Replace; // without this, you end up with duplicates.
                               
-					TSGeoIP.iSettings = JsonConvert.DeserializeObject<Settings>(json_string, s);
+					TSGeoIP.ISettings = JsonConvert.DeserializeObject<Settings>(json_string, s);
 					//TSGeoIP.ConsoleLOG(TSGeoIP.iSettings.PrefixString);
 				} else {
 					SaveSettting();

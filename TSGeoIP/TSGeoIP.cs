@@ -1,4 +1,9 @@
-﻿namespace TSGeoIP
+﻿// <copyright file="TSGeoIP.cs" company="POQDavid">
+// Copyright (c) POQDavid. All rights reserved.
+// </copyright>
+// <author>POQDavid</author>
+// <summary>This is the main class.</summary>
+namespace TSGeoIP
 {
 	// Import statements are placed here
 	using System;
@@ -35,103 +40,131 @@
 	[ApiVersion(1, 21)]
 	public class TSGeoIP : TerrariaPlugin
 	{
-
-		/// <summary>
+		
+		///<summary>
 		/// This is simply where plugin stores data and loads them from.
-		/// </summary>
-		/// <returns>directory for the plugin's data and settings.</returns>
-		public static string Data_Dir = @"TSGeoIP\";
+		///</summary>
+		///<returns>directory for the plugin's data and settings.</returns>
+		private static string dataDir = @"TSGeoIP\";
 		
-		/// <summary>
-		/// LookupService of GeoIP API in plugin.
-		/// </summary>
-		public LookupService GeoIP_LS;
-		
-		/// <summary>
-		/// DatabaseReader of GeoIP2 API in plugin.
-		/// </summary>
-		public DatabaseReader GeoIP2_DBR;
-		
-		/// <summary>
+		///<summary>
 		/// This is a static member of the Settings.
-		/// </summary>
-		public static Settings iSettings;
+		///</summary>
+		private static Settings iSettings;
+		
+		///<summary>
+		/// A static member of the plugin.
+		///</summary>
+		private static TerrariaPlugin that;
+		
+		///<summary>
+		/// This is simply the name of GeoIP database.
+		///</summary>
+		///<returns>full address of database for GeoIP.</returns>
+		private string geoIPDB = dataDir + "GeoLiteCity.dat";
+		
+		///<summary>
+		/// This is simply the name of GeoIP2 database.
+		///</summary>
+		///<returns>full address of database for GeoIP2.</returns>
+		private string geoIP2DB = dataDir + "GeoLite2-City.mmdb";
+		
+		///<summary>
+		/// LookupService of GeoIP API in plugin.
+		///</summary>
+		private LookupService geoIPLS;
+		
+		///<summary>
+		/// DatabaseReader of GeoIP2 API in plugin.
+		///</summary>
+		private DatabaseReader geoIP2DBR;
 		
 		// disable once FieldCanBeMadeReadOnly.Local
-		/// <summary>
+		///<summary>
 		/// To store player data.
-		/// </summary>
+		///</summary>
 		private Dictionary<int, string> myPlayersData = new Dictionary<int, string>();
         
-		/// <summary>
-		/// Plugin's version.
-		/// </summary>
-		public override Version Version {
-			get { return Assembly.GetExecutingAssembly().GetName().Version; }
-		}
- 
-		/// <summary>
-		/// Plugin's name.
-		/// </summary>
-		public override string Name {
-			get { return "TSGeoIP Plugin"; }
-		}
-		
-		/// <summary>
-		/// Plugin's author or POQDavid in this case lol.
-		/// </summary>
-		public override string Author {
-			get { return "POQDavid"; }
-		}
-
-		/// <summary>
-		/// The main program.
-		/// </summary>
-		/// <param name="game">Well it's clear what it is.</param>
+		///<summary>
+		/// Initializes a new instance of the <see cref="TSGeoIP" /> class.
+		///</summary>
+		///<param name="game">Well it's clear what it is.</param>
 		public TSGeoIP(Main game)
 			: base(game)
 		{
 			this.Order = 1;
 		}
 		
-		/// <summary>
-		/// A static member of the plugin.
-		/// </summary>
-		public static TerrariaPlugin that;
+		///<summary>
+		/// Gets or sets the dataDir property.
+		///</summary>
+		///<value>Directory for the plugin's data and settings.</value>
+		public static string DataDir { get; set; }
 		
-		/// <summary>
+		///<summary>
+		/// Gets or sets the iSettings property.
+		///</summary>
+		///<value>Plugin Settings.</value>
+		public static Settings ISettings { get; set; }
+		
+		///<summary>
+		/// Plugin's version.
+		///</summary>
+		///<value>Plugin version.</value>
+		public override Version Version {
+			get { return Assembly.GetExecutingAssembly().GetName().Version; }
+		}
+ 
+		///<summary>
+		/// Plugin's name.
+		///</summary>
+		///<value>Plugin name.</value>
+		public override string Name {
+			get { return "TSGeoIP Plugin"; }
+		}
+		
+		///<summary>
+		/// Plugin's author or POQDavid in this case.
+		///</summary>
+		///<value>Plugin author.</value>
+		public override string Author {
+			get { return "POQDavid"; }
+		}
+		
+		
+		///<summary>
 		/// A simple method to write in both console and log file.
-		/// </summary>
-		/// <param name="message">LOG message.</param>
+		///</summary>
+		///<param name="message">LOG message.</param>
 		public static void ConsoleLOG(string message)
 		{
 			TShock.Log.Write(message, TraceLevel.Info);
 			ServerApi.LogWriter.PluginWriteLine(that, message, TraceLevel.Info);
 		}
 		
-		/// <summary>
+		///<summary>
 		/// A simple method to write in both console and log file
 		/// with an extra option to set TraceLevel.
-		/// </summary>
-		/// <param name="message">LOG message.</param>
-		/// <param name="tl">LOG TraceLevel.</param>
+		///</summary>
+		///<param name="message">LOG message.</param>
+		///<param name="tl">LOG TraceLevel.</param>
 		public static void ConsoleLOG(string message, TraceLevel tl)
 		{
 			TShock.Log.Write(message, tl);
 			ServerApi.LogWriter.PluginWriteLine(that, message, tl);
 		}
 		
-		/// <summary>
+		///<summary>
 		/// Method to Initialize plugin's code.
-		/// </summary>
+		///</summary>
 		public override void Initialize()
 		{
 			that = this;
 			ConsoleLOG("Initializing TSGeoIP!");
 			
-			if (!Directory.Exists(Data_Dir)) {
+			if (!Directory.Exists(DataDir)) {
 				ConsoleLOG("Didn't found TSGeoIP folder!");
-				Directory.CreateDirectory(Data_Dir);
+				Directory.CreateDirectory(DataDir);
 				ConsoleLOG("Created TSGeoIP folder!");
 			} else {
 				ConsoleLOG("Found TSGeoIP folder!");
@@ -141,26 +174,24 @@
 			
 			Settings.LoadSettings();
 			
-			string geoIPDB = Data_Dir + "GeoIP.dat";
-			string geoIP2DB = Data_Dir + "GeoLite2-City.mmdb";
-			
+
 			if (iSettings.GeoIP_API.ToLower() == "geoip") {
-				if (File.Exists(geoIPDB)) {
-					this.GeoIP_LS = new LookupService(geoIPDB, LookupService.GEOIP_STANDARD);
+				if (File.Exists(this.geoIPDB)) {
+					this.geoIPLS = new LookupService(this.geoIPDB, LookupService.GEOIP_STANDARD);
 				} else {
-					ConsoleLOG("There is no GeoIP.dat", TraceLevel.Error);
-					this.GeoIP_LS = null;
+					ConsoleLOG("There is no GeoLiteCity.dat", TraceLevel.Error);
+					this.geoIPLS = null;
 				}
 			}
 			
 			if (iSettings.GeoIP_API.ToLower() == "geoip2") {
-				if (File.Exists(geoIP2DB)) {
+				if (File.Exists(this.geoIP2DB)) {
 					
-					this.GeoIP2_DBR = new DatabaseReader(geoIP2DB);
+					this.geoIP2DBR = new DatabaseReader(this.geoIP2DB);
 					  
 				} else {
 					ConsoleLOG("There is no GeoLite2-City.mmdb", TraceLevel.Error);
-					this.GeoIP_LS = null;
+					this.geoIP2DBR = null;
 				}
 			}
 			
@@ -171,11 +202,11 @@
 			ServerApi.Hooks.ServerLeave.Register(this, this.OnLeave);
 		}
 		
-		/// <summary>
+		///<summary>
 		/// Method to get player's country ISO code.
-		/// </summary>
-		/// <param name="playerTemp">Gets the player object.</param>
-		/// <returns>Country ISO Code.</returns>
+		///</summary>
+		///<param name="playerTemp">Gets the player object.</param>
+		///<returns>Country ISO Code.</returns>
 		public string GetPlayerFlag(TSPlayer playerTemp)
 		{
 			string temp = "Earth";
@@ -193,14 +224,18 @@
 					if (playerip.Contains(".")) {
 						try {
 							
-							if (this.GeoIP_LS != null) {
-								Country c = this.GeoIP_LS.getCountry(playerip);
-								temp = c.getCode();
+							if (iSettings.GeoIP_API.ToLower() == "geoip") {
+								if (this.geoIPLS != null) {
+									Country c = this.geoIPLS.getCountry(playerip);
+									temp = c.getCode();
+								}
 							}
 							
-							if (this.GeoIP2_DBR != null) {
-								var cDB = this.GeoIP2_DBR.City(playerip);
-								temp = cDB.Country.IsoCode;
+							if (iSettings.GeoIP_API.ToLower() == "geoip2") {
+								if (this.geoIP2DBR != null) {
+									var cDB = this.geoIP2DBR.City(playerip);
+									temp = cDB.Country.IsoCode;
+								}
 							}
 
 						} catch (Exception ex) {
@@ -214,10 +249,10 @@
 			return temp.ToLower();
 		}
 		
-		/// <summary>
+		///<summary>
 		/// Method to dispose things needed.
-		/// </summary>
-		/// <param name="disposing">To dispose or not.</param>
+		///</summary>
+		///<param name="disposing">To dispose or not.</param>
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing) {
@@ -231,19 +266,19 @@
 			base.Dispose(disposing);
 		}
         
-		/// <summary>
+		///<summary>
 		/// Things to do OnInitialize.
-		/// </summary>
-		/// <param name="args">Containing event data.</param>
+		///</summary>
+		///<param name="args">Containing event data.</param>
 		private void OnInitialize(EventArgs args)
 		{
 			Commands.ChatCommands.Add(new Command("tsgeoip.admin.commands", this.TSGeoIPCMD, "tsgeoip"));
 		}
 
-		/// <summary>
+		///<summary>
 		/// This event happens every time a player leaves the server.
-		/// </summary>
-		/// <param name="args">Containing event data.</param>
+		///</summary>
+		///<param name="args">Containing event data.</param>
 		private void OnLeave(LeaveEventArgs args)
 		{
 			if (this.myPlayersData.ContainsKey(TShock.Players[args.Who].Index)) {
@@ -252,11 +287,20 @@
 			}
 		}
 		
-		/// <summary>
+		///<summary>
 		/// This event happens every time a player joins the server.
-		/// </summary>
-		/// <param name="args">Containing event data.</param>
+		///</summary>
+		///<param name="args">Containing event data.</param>
 		private void OnJoin(JoinEventArgs args)
+		{
+	
+		}
+		
+		///<summary>
+		/// This event happens every time player really joins the server.
+		///</summary>
+		///<param name="args">Containing event data.</param>
+		private void OnNetGreet(GreetPlayerEventArgs args)
 		{
 			var tsplr = TShock.Players[args.Who];     
 			string tsplr_name = tsplr.Name;
@@ -272,28 +316,20 @@
 				} else {
 					this.myPlayersData[tsplr.Index] = this.GetPlayerFlag(tsplr);
 				}
-			}	
+			}
 		}
 		
-		/// <summary>
-		/// This event happens every time player really joins the server.
-		/// </summary>
-		/// <param name="args">Containing event data.</param>
-		private void OnNetGreet(GreetPlayerEventArgs args)
-		{
-
-		}
-		
-		/// <summary>
+		///<summary>
 		/// This method is for handling the plugin's commands.
-		/// </summary>
-		/// <param name="args">Containing event data.</param>
+		///</summary>
+		///<param name="args">Containing event data.</param>
 		private void TSGeoIPCMD(CommandArgs args)
 		{
 			if (args.Parameters.Count < 1) {
 				args.Player.SendErrorMessage("Invalid syntax! Proper syntax:");
 				args.Player.SendErrorMessage("{0}tsgeoip reload_set", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip save_set", TShock.Config.CommandSpecifier);
+				args.Player.SendErrorMessage("{0}tsgeoip dbmode <geoip/geoip2>", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip prefix true|false", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip suffix true|false", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip prefix_str \"({0}) \"", TShock.Config.CommandSpecifier);
@@ -314,6 +350,56 @@
 				case "save_set":
 					{
 						Settings.SaveSettting();
+					}
+					return;
+				case "dbmode":
+					{
+						if (args.Parameters.Count != 2) {
+							args.Player.SendErrorMessage("Invalid syntax: {0}tsgeoip dbmode <geoip/geoip2>", TShock.Config.CommandSpecifier);
+							return;
+						}
+
+						switch (args.Parameters[1].ToLower()) {
+							case "geoip":
+								{
+									iSettings.GeoIP_API = "GeoIP";
+									if (File.Exists(this.geoIPDB)) {
+										this.geoIPLS = new LookupService(this.geoIPDB, LookupService.GEOIP_STANDARD);
+										try {
+											this.geoIP2DBR.Dispose();
+										} catch (Exception) {
+										}
+										try {
+											this.geoIP2DBR = null;
+										} catch (Exception) {
+										}
+										
+									} else {
+										ConsoleLOG("There is no GeoLiteCity.dat", TraceLevel.Error);
+										this.geoIPLS = null;
+									}
+									Settings.SaveSettting();
+								}
+								return;
+							case "geoip2":
+								{
+									iSettings.GeoIP_API = "GeoIP2";
+									if (File.Exists(this.geoIP2DB)) {
+										this.geoIP2DBR = new DatabaseReader(this.geoIP2DB);
+
+										try {
+											this.geoIPLS = null;
+										} catch (Exception) {
+										}
+										
+									} else {
+										ConsoleLOG("There is no GeoLite2-City.mmdb", TraceLevel.Error);
+										this.geoIP2DBR = null;
+									}
+									Settings.SaveSettting();
+								}
+								return;
+						}
 					}
 					return;
 				case "prefix":
@@ -440,6 +526,7 @@
 					{
 						args.Player.SendInfoMessage("{0}tsgeoip reload_set", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip save_set", TShock.Config.CommandSpecifier);
+						args.Player.SendInfoMessage("{0}tsgeoip dbmode <geoip/geoip2>", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip prefix true|false", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip suffix true|false", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip prefix_str \"({0}) \"", TShock.Config.CommandSpecifier);
@@ -458,10 +545,10 @@
 			}
 		}
         
-		/// <summary>
+		///<summary>
 		/// This method is for handling prefix and suffix in chat.
-		/// </summary>
-		/// <param name="args">Containing event data.</param>
+		///</summary>
+		///<param name="args">Containing event data.</param>
 		private void OnChat(ServerChatEventArgs args)
 		{
 			if (args.Handled)
@@ -502,6 +589,7 @@
 				args.Handled = true;
 				return;
 			}
+			//SA1119
 			if ((!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier))) {
 				if (!tsplr.Group.HasPermission(Permissions.canchat)) {
 					args.Handled = true;
@@ -534,6 +622,7 @@
 				}
 			}
 		}
-        
+		
+
 	}
 }

@@ -53,7 +53,7 @@
 		///<summary>
 		/// Default value for AKC_White_List.
 		///</summary>
-		private System.Collections.Generic.List<string> defaultAKCWList = new System.Collections.Generic.List<string> { "POQDavid" };
+		private System.Collections.Generic.List<string> defaultAKCWList = new System.Collections.Generic.List<string> { };
 		
 		///<summary>
 		/// Gets or sets the asPrefix property.

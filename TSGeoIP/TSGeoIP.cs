@@ -300,6 +300,8 @@
 				args.Player.SendErrorMessage("{0}tsgeoip suffix_str \" ({0})\"", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip akl <add/remove> <country code>", TShock.Config.CommandSpecifier);
 				args.Player.SendErrorMessage("{0}tsgeoip akl_list", TShock.Config.CommandSpecifier);
+				args.Player.SendErrorMessage("{0}tsgeoip aklw <add/remove> <player name>", TShock.Config.CommandSpecifier);
+				args.Player.SendErrorMessage("{0}tsgeoip aklw_list", TShock.Config.CommandSpecifier);
 				return;
 			}
 			
@@ -374,6 +376,16 @@
 									 
 					}
 					return;
+				case "aklw_list":
+					{
+						args.Player.SendInfoMessage("**AKL WHITELIST**");
+						foreach (string ccode in TSGeoIP.iSettings.AKC_White_List) {
+							args.Player.SendInfoMessage("  " + ccode);
+						}
+						args.Player.SendInfoMessage("**AKL WHITELIST**");
+									 
+					}
+					return;
 				case "akl":
 					{
 						if (args.Parameters.Count != 3) {
@@ -399,6 +411,31 @@
 						}
 					}
 					return;
+				case "aklw":
+					{
+						if (args.Parameters.Count != 3) {
+							args.Player.SendErrorMessage("Invalid syntax: {0}tsgeoip aklw <add/remove> <player name>", TShock.Config.CommandSpecifier);
+							return;
+						}
+
+						switch (args.Parameters[1].ToLower()) {
+							case "add":
+								{
+									TSGeoIP.iSettings.AKC_White_List.Add(args.Parameters[2].ToLower());
+									args.Player.SendInfoMessage("Added player to the whitelist!");
+									Settings.SaveSettting();
+								}
+								return;
+							case "remove":
+								{
+									TSGeoIP.iSettings.AKC_White_List.Remove(args.Parameters[2].ToLower());
+									args.Player.SendInfoMessage("Removed player from the whitelist!");
+									Settings.SaveSettting();
+								}
+								return;
+						}
+					}
+					return;
 				case "help":
 					{
 						args.Player.SendInfoMessage("{0}tsgeoip reload_set", TShock.Config.CommandSpecifier);
@@ -409,6 +446,8 @@
 						args.Player.SendInfoMessage("{0}tsgeoip suffix_str \" ({0})\"", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip akl <add/remove> <country code>", TShock.Config.CommandSpecifier);
 						args.Player.SendInfoMessage("{0}tsgeoip akl_list", TShock.Config.CommandSpecifier);
+						args.Player.SendInfoMessage("{0}tsgeoip aklw <add/remove> <player name>", TShock.Config.CommandSpecifier);
+						args.Player.SendInfoMessage("{0}tsgeoip aklw_list", TShock.Config.CommandSpecifier);
 					}
 					return;
 				default:

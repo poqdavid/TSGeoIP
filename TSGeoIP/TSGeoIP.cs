@@ -99,13 +99,13 @@ namespace TSGeoIP
 		/// Gets or sets the dataDir property.
 		///</summary>
 		///<value>Directory for the plugin's data and settings.</value>
-		public static string DataDir { get; set; }
+		public static string DataDir { get { return dataDir; } set { dataDir = value; }  }
 		
 		///<summary>
 		/// Gets or sets the iSettings property.
 		///</summary>
 		///<value>Plugin Settings.</value>
-		public static Settings ISettings { get; set; }
+		public static Settings ISettings { get { return iSettings; } set { iSettings = value; } }
 		
 		///<summary>
 		/// Plugin's version.
@@ -162,9 +162,9 @@ namespace TSGeoIP
 			that = this;
 			ConsoleLOG("Initializing TSGeoIP!");
 			
-			if (!Directory.Exists(DataDir)) {
+			if (!Directory.Exists(dataDir)) {
 				ConsoleLOG("Didn't found TSGeoIP folder!");
-				Directory.CreateDirectory(DataDir);
+				Directory.CreateDirectory(dataDir);
 				ConsoleLOG("Created TSGeoIP folder!");
 			} else {
 				ConsoleLOG("Found TSGeoIP folder!");

@@ -22,7 +22,6 @@ This is a GeoIP plugin for TShock
 
     /tsgeoip reload_set
     /tsgeoip save_set
-    /tsgeoip dbmode <geoip/geoip2>
     /tsgeoip prefix true|false
     /tsgeoip suffix true|false
     /tsgeoip prefix_str "({0}) "

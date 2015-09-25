@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Tsgeoip by poqdavid</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Tsgeoip</h1>
+        <p>This is a GeoIP plugin for TShock</p>
+        <p class="view"><a href="https://github.com/poqdavid/TSGeoIP">View the Project on GitHub <small>poqdavid/TSGeoIP</small></a></p>
+        <ul>
+          <li><a href="https://github.com/poqdavid/TSGeoIP/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/poqdavid/TSGeoIP/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/poqdavid/TSGeoIP">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="tsgeoip" class="anchor" href="#tsgeoip" aria-hidden="true"><span class="octicon octicon-link"></span></a>TSGeoIP</h1>
+
+<p>This is a GeoIP plugin for TShock  </p>
+
+<hr>
+
+<p><strong>Well using this plugin is very simple:</strong>  </p>
+
+<ol>
+<li>You simply unzip the plugin in to your server's folder<br>
+</li>
+<li>Then you just have to download GeoIP and GeoIP2 Databases<br>
+</li>
+<li>Extract the databases in <code>TSGeoIP</code> folder<br>
+<a href="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz">GeoIP City Database</a><br>
+<a href="http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz">GeoIP2 City Database</a>
+</li>
+</ol>
+
+<p><strong>Things you can do with this plugin:</strong></p>
+
+<ol>
+<li>You can set Country Code as a prefix or suffix for each player by adding %TSGeoIP-CC-Prefix and %TSGeoIP-CC-Suffix to the user's Prefix and Suffix.</li>
+<li>You can setup a region limit for your server.</li>
+<li>You can use the whitelist to allow players to avoid the region limit.</li>
+</ol>
+
+<p><strong>List of commands:</strong></p>
+
+<pre><code>/tsgeoip reload_set
+/tsgeoip save_set
+/tsgeoip dbmode &lt;geoip/geoip2&gt;
+/tsgeoip prefix true|false
+/tsgeoip suffix true|false
+/tsgeoip prefix_str "({0}) "
+/tsgeoip suffix_str " ({0})"
+/tsgeoip akl &lt;add/remove&gt; &lt;country code&gt;
+/tsgeoip akl_list
+/tsgeoip aklw &lt;add/remove&gt; &lt;player name&gt;
+/tsgeoip aklw_list
+</code></pre>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/poqdavid">poqdavid</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
